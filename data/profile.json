@@ -1,0 +1,138 @@
+{
+  "sheetNames": [
+    "Sheet1"
+  ],
+  "rowCount": 5000,
+  "columns": [
+    "id",
+    "data_referencia",
+    "cidade",
+    "estado",
+    "regiao",
+    "categoria",
+    "bairro_tipo",
+    "metragem_m2",
+    "custo_m2_brl",
+    "preco_total_brl",
+    "renda_familiar_media_mensal_brl",
+    "quartos",
+    "banheiros",
+    "vagas_garagem"
+  ],
+  "sample": {
+    "id": 1,
+    "data_referencia": 45585,
+    "cidade": "Belém",
+    "estado": "PA",
+    "regiao": "Norte",
+    "categoria": "Popular",
+    "bairro_tipo": "Mista",
+    "metragem_m2": 63.2,
+    "custo_m2_brl": 3110.4,
+    "preco_total_brl": 196577.52,
+    "renda_familiar_media_mensal_brl": 5358.6,
+    "quartos": 2,
+    "banheiros": 2,
+    "vagas_garagem": 0
+  },
+  "profile": {
+    "id": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 1000.5,
+      "min": 1,
+      "max": 2000
+    },
+    "data_referencia": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 45394.958,
+      "min": 44927,
+      "max": 45870
+    },
+    "cidade": {
+      "nonNull": 2000,
+      "numeric": 0,
+      "avg": null,
+      "min": null,
+      "max": null
+    },
+    "estado": {
+      "nonNull": 2000,
+      "numeric": 0,
+      "avg": null,
+      "min": null,
+      "max": null
+    },
+    "regiao": {
+      "nonNull": 2000,
+      "numeric": 0,
+      "avg": null,
+      "min": null,
+      "max": null
+    },
+    "categoria": {
+      "nonNull": 2000,
+      "numeric": 0,
+      "avg": null,
+      "min": null,
+      "max": null
+    },
+    "bairro_tipo": {
+      "nonNull": 2000,
+      "numeric": 0,
+      "avg": null,
+      "min": null,
+      "max": null
+    },
+    "metragem_m2": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 118.30549999999982,
+      "min": 40.1,
+      "max": 300
+    },
+    "custo_m2_brl": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 7064.366910000009,
+      "min": 2557.39,
+      "max": 14958.83
+    },
+    "preco_total_brl": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 977254.376420001,
+      "min": 107842.17,
+      "max": 4172878.75
+    },
+    "renda_familiar_media_mensal_brl": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 12030.229405000011,
+      "min": 4341.8,
+      "max": 41425.68
+    },
+    "quartos": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 3.1105,
+      "min": 1,
+      "max": 6
+    },
+    "banheiros": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 2.566,
+      "min": 1,
+      "max": 5
+    },
+    "vagas_garagem": {
+      "nonNull": 2000,
+      "numeric": 2000,
+      "avg": 1.4825,
+      "min": 0,
+      "max": 3
+    }
+  }
+}

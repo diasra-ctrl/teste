@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Indicadores | Mercado Imobiliário - Capitais do Brasil</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+	<style>
+		:root {
+			--bg: #0f172a;
+			--card: #111827;
+			--muted: #9ca3af;
+			--text: #f9fafb;
+			--accent: #22d3ee;
+		}
+		* { box-sizing: border-box; }
+		body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: linear-gradient(180deg, #0b1021, #070b18); color: var(--text); }
+		header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); position: sticky; top: 0; backdrop-filter: blur(8px); background: rgba(7, 11, 24, 0.7); z-index: 10; }
+		header h1 { margin: 0; font-size: 20px; letter-spacing: 0.2px; }
+		.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+		.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+		.card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+		.kpi { display: flex; flex-direction: column; gap: 6px; }
+		.kpi .label { font-size: 12px; color: var(--muted); }
+		.kpi .value { font-size: 22px; font-weight: 700; }
+		.kpi .sub { font-size: 12px; color: var(--muted); }
+		.section-title { font-size: 14px; color: var(--muted); margin: 2px 0 10px; text-transform: uppercase; letter-spacing: 0.14em; }
+		.list { list-style: none; margin: 0; padding: 0; }
+		.list li { padding: 10px 8px; border-bottom: 1px dashed rgba(255,255,255,0.08); }
+		.badge { display: inline-block; padding: 3px 8px; border-radius: 999px; background: rgba(34,211,238,0.18); color: #67e8f9; font-size: 11px; border: 1px solid rgba(103,232,249,0.25); }
+		.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+		.table th, .table td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; }
+		.table th { color: var(--muted); font-weight: 600; }
+		.footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px; }
+		@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+	</style>
+</head>
+<body>
+	header>
+		<h1>Indicadores do Mercado Imobiliário • Capitais do Brasil</h1>
+	</header>
+	<div class="container">
+		<div id="meta" class="card" style="margin-bottom: 16px;">
+			<div class="section-title">Visão Geral</div>
+			<div class="grid">
+				<div class="card kpi" style="grid-column: span 3;">
+					<div class="label">Amostra</div>
+					<div id="kpi-amostra" class="value">—</div>
+					<div class="sub">número de registros</div>
+				</div>
+				<div class="card kpi" style="grid-column: span 3;">
+					<div class="label">Custo médio por m²</div>
+					<div id="kpi-custo-m2" class="value">—</div>
+					<div class="sub">BRL por m²</div>
+				</div>
+				<div class="card kpi" style="grid-column: span 3;">
+					<div class="label">Ticket médio</div>
+					<div id="kpi-ticket" class="value">—</div>
+					<div class="sub">preço total</div>
+				</div>
+				<div class="card kpi" style="grid-column: span 3;">
+					<div class="label">Correlação custo/m² × renda</div>
+					<div id="kpi-corr" class="value">—</div>
+					<div class="sub">associação preço × renda</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="grid">
+			<div class="card" style="grid-column: span 7;">
+				<div class="section-title">Top 10 capitais por custo/m²</div>
+				<canvas id="chartCusto"></canvas>
+			</div>
+			<div class="card" style="grid-column: span 5;">
+				<div class="section-title">Mix por nº de quartos (geral)</div>
+				<canvas id="chartQuartos"></canvas>
+			</div>
+		</div>
+
+		<div class="grid">
+			<div class="card" style="grid-column: span 12;">
+				<div class="section-title">Capitais com maior ticket médio</div>
+				<table class="table" id="tableTicket">
+					<thead>
+						<tr>
+							<th>Capital</th>
+							<th>Ticket médio</th>
+							<th>Custo médio/m²</th>
+							<th>Metragem média (m²)</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="grid">
+			<div class="card" style="grid-column: span 12;">
+				<div class="section-title">Top 5 insights para ações de marketing de vendas</div>
+				<ol id="insights" class="list"></ol>
+			</div>
+		</div>
+	</div>
+
+	<div class="footer">Fonte: base_casas_capitais_brasil_5000.xlsx • Atualizado em <span id="updatedAt">—</span></div>
+
+	<script>
+	async function load() {
+		const res = await fetch('data/kpis.json');
+		const data = await res.json();
+		document.getElementById('updatedAt').textContent = new Date(data.updatedAt).toLocaleString('pt-BR');
+
+		const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+		const num = new Intl.NumberFormat('pt-BR');
+
+		// KPIs
+		document.getElementById('kpi-amostra').textContent = num.format(data.total.count);
+		document.getElementById('kpi-custo-m2').textContent = fmt.format(data.total.custo_m2_brl.avg || 0);
+		document.getElementById('kpi-ticket').textContent = fmt.format(data.total.preco_total_brl.avg || 0);
+		document.getElementById('kpi-corr').textContent = (data.total.corr_custo_m2_renda ?? 0).toFixed(2);
+
+		// Chart: Top custo/m²
+		const topCusto = data.lists.topCidadesCustoM2.slice(0, 10);
+		new Chart(document.getElementById('chartCusto'), {
+			type: 'bar',
+			data: {
+				labels: topCusto.map(x => x.key),
+				datasets: [{
+					label: 'Custo médio/m² (BRL)',
+					data: topCusto.map(x => x.value),
+					borderRadius: 8,
+					backgroundColor: 'rgba(34,211,238,0.5)',
+					borderColor: 'rgba(34,211,238,0.9)'
+				}]
+			},
+			options: {
+				plugins: { legend: { display: false } },
+				scales: {
+					x: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+					y: { ticks: { color: '#cbd5e1', callback: v => fmt.format(v) }, grid: { color: 'rgba(255,255,255,0.06)' } }
+				}
+			}
+		});
+
+		// Chart: Mix quartos
+		const mix = data.total.mix_quartos;
+		const quartosLabels = Object.keys(mix).sort((a,b)=>Number(a)-Number(b));
+		new Chart(document.getElementById('chartQuartos'), {
+			type: 'doughnut',
+			data: {
+				labels: quartosLabels.map(q => q + ' quartos'),
+				datasets: [{
+					data: quartosLabels.map(q => Math.round((mix[q]||0)*1000)/10),
+					backgroundColor: ['#22d3ee','#60a5fa','#a78bfa','#f472b6','#fbbf24','#34d399'],
+					borderColor: 'rgba(255,255,255,0.1)'
+				}]
+			},
+			options: { plugins: { legend: { position: 'bottom', labels: { color: '#e5e7eb' } } } }
+		});
+
+		// Tabela: Top ticket
+		const topTicket = data.lists.topCidadesTicket.slice(0, 15);
+		const tbody = document.querySelector('#tableTicket tbody');
+		for (const row of topTicket) {
+			const k = row.key;
+			const s = data.byCidade[k];
+			const tr = document.createElement('tr');
+			tr.innerHTML = `
+				<td><span class="badge">${k}</span></td>
+				<td>${fmt.format(s.preco_total_brl.avg || 0)}</td>
+				<td>${fmt.format(s.custo_m2_brl.avg || 0)}</td>
+				<td>${num.format(Math.round((s.metragem_m2.avg || 0)))}</td>
+			`;
+			tbody.appendChild(tr);
+		}
+
+		// Insights (5 principais)
+		const insights = [];
+		if (data.insights && data.insights.length) insights.push(...data.insights);
+		// Curadoria adicional baseada nos dados
+		const topCustoCity = topCusto[0]?.key;
+		if (topCustoCity) insights.unshift(`Priorizar campanhas premium em ${topCustoCity}, onde o custo/m² é o mais alto, favorecendo produtos de alto valor.`);
+		const maiorMix = Object.entries(mix).sort((a,b)=>b[1]-a[1])[0];
+		if (maiorMix) insights.push(`Segmentar criativos para tipologia de ${maiorMix[0]} quartos, hoje com maior participação no mix.`);
+		const regiaoMaisCara = Object.entries(data.byRegiao).map(([k,v])=>({k,v})).sort((a,b)=> (b.v.custo_m2_brl.avg||0) - (a.v.custo_m2_brl.avg||0))[0];
+		if (regiaoMaisCara) insights.push(`Reforçar presença na região ${regiaoMaisCara.k} com campanhas de consideração e remarketing.`);
+		const cidadesAltaRenda = Object.entries(data.byCidade).filter(([k,v])=> (v.renda_familiar_media_mensal_brl.avg||0) > (data.total.renda_familiar_media_mensal_brl.avg||0)).slice(0,5).map(([k])=>k);
+		if (cidadesAltaRenda.length) insights.push(`Explorar bundles de serviços e upsell em ${cidadesAltaRenda.slice(0,3).join(', ')} pela renda acima da média.`);
+		const top5 = insights.slice(0,5);
+		for (const txt of top5) {
+			const li = document.createElement('li');
+			li.textContent = txt;
+			document.getElementById('insights').appendChild(li);
+		}
+	}
+	load();
+	</script>
+</body>
+</html>
